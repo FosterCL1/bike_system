@@ -79,7 +79,7 @@ int main(int argc, const char *argv) {
        rpms = calculateRpmFromPulses(numPulses);
 
        memset(msg.kbuf, '\0', sizeof(msg.kbuf));
-       snprintf(msg.kbuf, sizeof(msg.kbuf), "RPMS: %3.1f", rpms);
+       snprintf(msg.kbuf, sizeof(msg.kbuf), "RPMS: %3.1f    ", rpms);
 
        if (ioctl(lcd_fd, (unsigned int) IOCTL_PRINT_ON_FIRST_LINE, &msg) < 0) {
            printf("Error writing to the LCD\n");
