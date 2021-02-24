@@ -78,8 +78,9 @@ int readAngle(int tilt_fd, uint16_t *angle)
         .tx_buf = (unsigned long)tx,
         .rx_buf = (unsigned long)rx, 
         .len = 2,
-        .delay_usecs = 0,
-        .bits_per_word = 0,
+        .delay_usecs = 1,
+        .bits_per_word = 8,
+        .speed_hz = 500000,
     };
 
     ret = ioctl(tilt_fd, SPI_IOC_MESSAGE(1), &tr);
@@ -88,6 +89,10 @@ int readAngle(int tilt_fd, uint16_t *angle)
         printf("Error sending SPI message\n");
         return -1;
     }
+    else
+    {
+        //printf("Raw tilt values: 0x%02x 0x%02x\n", rx[0], rx[1]);
+    }
 
     // The first two bits are alarms - ignore em?
     uint16_t temp = (rx[0] & 0x3F) << 6;
@@ -95,6 +100,9 @@ int readAngle(int tilt_fd, uint16_t *angle)
     temp |= rx[1] >> 2;
 
     *angle = temp;
+
+    //printf("Calculated angle: %d\n", *angle);
+
     return 0;
 }
 
@@ -109,7 +117,7 @@ int readAndPrintAngleOnSecondLine(int tilt_fd, int lcd_fd)
     }
 
     memset(msg.kbuf, '\0', sizeof(msg.kbuf));
-    snprintf(msg.kbuf, sizeof(msg.kbuf), "T: %d", angle);
+    snprintf(msg.kbuf, sizeof(msg.kbuf), "T: %d", 2800 - angle);
 
     if (ioctl(lcd_fd, (unsigned int) IOCTL_PRINT_ON_SECOND_LINE, &msg) < 0) {
         printf("Error writing to the LCD\n");
